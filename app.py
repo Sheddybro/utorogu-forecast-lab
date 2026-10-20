@@ -112,7 +112,7 @@ with forecast_tab:
     f=current[1] if current is not None and current[0]==key else None
     if f is None:st.info('Historical production is shown below. Configure a model in the sidebar and select Run forecast to add its projection.')
     series=monthly[stream].loc[:cutoff] if f is not None else monthly[stream]
-    st.plotly_chart(plot_series(series,cutoff if f is not None else None,f,show_actual,sensitivity),use_container_width=True)
+    st.plotly_chart(plot_series(series,cutoff if f is not None else None,f,show_actual,sensitivity),use_container_width=True,key='forecast_plot')
     if f is not None:
         a,b,c=st.columns(3)
         a.metric('Forecast end',f.Date.iloc[-1].strftime('%b %Y'))
@@ -122,9 +122,9 @@ with forecast_tab:
         st.dataframe(f.tail(18),use_container_width=True,hide_index=True)
 with history_tab:
     st.subheader('Historical field performance')
-    st.plotly_chart(plot_series(monthly[stream]),use_container_width=True)
+    st.plotly_chart(plot_series(monthly[stream]),use_container_width=True,key='history_plot')
     annual=monthly[['OIL','GAS','WATER']].resample('YS').sum(min_count=1)
-    st.plotly_chart(go.Figure([go.Bar(x=annual.index.year,y=annual[x],name=x) for x in ['OIL','GAS','WATER']]).update_layout(barmode='group',height=380,plot_bgcolor='white',paper_bgcolor='white',font_color='#203e59'),use_container_width=True)
+    st.plotly_chart(go.Figure([go.Bar(x=annual.index.year,y=annual[x],name=x) for x in ['OIL','GAS','WATER']]).update_layout(barmode='group',height=380,plot_bgcolor='white',paper_bgcolor='white',font_color='#203e59'),use_container_width=True,key='annual_production_plot')
     st.download_button('⬇ Download monthly production',monthly.to_csv().encode(),'utorogu_monthly_history.csv','text/csv')
 with compare_tab:
     st.subheader('Chronological, fixed-origin model comparison')
