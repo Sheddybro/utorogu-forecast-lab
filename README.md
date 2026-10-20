@@ -1,26 +1,22 @@
-# Utorogu Production Intelligence V3
+# Utorogu Production Intelligence V5
 
-Responsive Streamlit application for field- and completion-level production exploration, fixed-origin forecasting, rolling-origin validation and model comparison.
+A Streamlit forecasting and data-quality application based on the Utorogu OML 34 spreadsheet and the accompanying thesis/notebook.
 
-## Run on Windows / VS Code
+## Start locally
+
+Python 3.11 or 3.12 recommended (64-bit).
 
 ```powershell
-py -m venv .venv
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-streamlit run app.py
+python -m pip install -r requirements.txt
+python -m streamlit run app.py
 ```
 
-## Deploy to Streamlit Community Cloud
+## Free cloud deployment
 
-1. Create a **private** GitHub repository and upload `app.py`, `requirements.txt`, and `production.xlsx` from this folder.
-2. Sign in to https://share.streamlit.io/ and create an app from that repository, with `app.py` as the entry point.
-3. Be aware that a publicly accessible Streamlit deployment exposes dashboard content and potentially dataset-derived information to anyone with access to the app. Check your rights to publish the production data before deploying.
+Commit `app.py`, `models.py`, `data_quality.py`, `production.xlsx`, and `requirements.txt` to a GitHub repository. Set the Streamlit Community Cloud entry point to `app.py` and select Python 3.11/3.12 if offered. **TensorFlow and Prophet make the installation larger and LSTM/ensemble runs slower**; free resource limits may be exceeded. If the deployment fails because of memory, use a higher-memory hosting service or omit the optional LSTM dependency and do not select LSTM models.
 
 ## Research caveats
 
-- Units and whether the source contains monthly totals or rates have not been independently established.
-- Scenario bands are ±20% sensitivities, **not** statistical prediction intervals.
-- Long-range forecasts are extrapolations and not reserves estimates.
-- Models are refitted from history available at each cutoff; future actuals are used for scoring only.
-- Model rankings depend on selected origins, horizon, stream and available actuals.
+This dashboard implements the named model families but does not claim to exactly reproduce the notebook's hyperparameters or its feature-based multivariate ML results. In particular XGBoost is calendar-feature based, LSTM is recursive univariate, and Prophet+XGBoost uses a calendar-feature residual learner. Validation is fixed-origin; do not use future actuals as predictors. The notebook uses an entity positive-oil-month share rule rather than the observed-span coverage filter of earlier dashboard versions. With the bundled data, December 2014 cutoff and 40% positive-oil-month rule, the cleaning implementation retained 47 entities in a local verification. This matches the thesis count but does not prove that every individual entity or downstream forecast is identical; compare entity IDs and outputs against the notebook. Units are unverified; forecast bands are sensitivity scenarios.
