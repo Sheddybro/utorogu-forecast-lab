@@ -10,26 +10,26 @@ from models import MODELS,forecast,metrics,clean_history
 
 st.set_page_config(page_title='Utorogu | Production Intelligence',page_icon='🛢️',layout='wide',initial_sidebar_state='collapsed')
 st.markdown("""<style>
-:root { --ink:#17324d; --teal:#087f8c; }
-.stApp {background:#f6f8fc;color:#17324d}
+:root { --ink:#252451; --blue:#3658b8; --purple:#7650b5; }
+.stApp {background:#f6f7fc;color:#252451}
 .block-container {max-width:1540px;padding-top:1.25rem;padding-bottom:3rem;padding-left:2.3rem;padding-right:2.3rem}
-[data-testid="stHeader"]{background:rgba(246,248,252,.96)}
-section[data-testid="stSidebar"] {background:#14283e;min-width:250px!important;max-width:290px!important}
+[data-testid="stHeader"]{background:rgba(246,247,252,.96)}
+section[data-testid="stSidebar"] {background:#202344;min-width:250px!important;max-width:290px!important}
 section[data-testid="stSidebar"] > div {width:100%!important}
-section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,section[data-testid="stSidebar"] label,section[data-testid="stSidebar"] h1,section[data-testid="stSidebar"] h2,section[data-testid="stSidebar"] h3 {color:#edf5fc!important}
-section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {color:#b6c8da!important}
-section[data-testid="stSidebar"] [data-testid="stWidgetLabel"] p {color:#e4edf7!important}
-[data-testid="stMetric"] {background:white;border:1px solid #e2eaf2;border-radius:13px;padding:16px 18px;min-width:0;box-shadow:0 3px 12px rgba(17,45,74,.035)}
-[data-testid="stMetricLabel"] p {font-size:.85rem!important;color:#61758a!important;white-space:normal!important}
-[data-testid="stMetricValue"] {font-size:clamp(1.3rem,2vw,2rem)!important;color:#143752!important;overflow:visible!important;white-space:normal!important;overflow-wrap:anywhere!important}
+section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,section[data-testid="stSidebar"] label,section[data-testid="stSidebar"] h1,section[data-testid="stSidebar"] h2,section[data-testid="stSidebar"] h3 {color:#f1f0ff!important}
+section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {color:#c2c5e2!important}
+section[data-testid="stSidebar"] [data-testid="stWidgetLabel"] p {color:#e2e4f5!important}
+[data-testid="stMetric"] {background:white;border:1px solid #e1e3f1;border-radius:13px;padding:16px 18px;min-width:0;box-shadow:0 3px 12px rgba(38,42,91,.045)}
+[data-testid="stMetricLabel"] p {font-size:.85rem!important;color:#656987!important;white-space:normal!important}
+[data-testid="stMetricValue"] {font-size:clamp(1.3rem,2vw,2rem)!important;color:#292c5a!important;overflow:visible!important;white-space:normal!important;overflow-wrap:anywhere!important}
 [data-testid="stMetricDelta"]{display:none}
-h1,h2,h3 {color:#17324d!important;letter-spacing:-.025em}
-.hero {background:linear-gradient(105deg,#15354e 0%,#126875 100%);border-radius:16px;padding:24px 30px;margin:0 0 20px;color:#fff}
+h1,h2,h3 {color:#252451!important;letter-spacing:-.025em}
+.hero {background:linear-gradient(105deg,#303b83 0%,#6946a6 100%);border-radius:16px;padding:24px 30px;margin:0 0 20px;color:#fff}
 .hero h1{font-size:clamp(1.6rem,2.3vw,2.35rem)!important;color:#fff!important;margin:0!important;line-height:1.22}
-.hero p{color:#d6eaf0;font-size:.91rem;margin:9px 0 0}
-.stButton>button[kind="primary"] {background:#087e89;border:0;border-radius:8px}
-[data-testid="stVerticalBlockBorderWrapper"] {border-color:#e2eaf2}
-[data-testid="stPlotlyChart"] {background:#fff;border-radius:12px;border:1px solid #e5ebf3;padding:6px}
+.hero p{color:#e3e3fb;font-size:.91rem;margin:9px 0 0}
+.stButton>button[kind="primary"] {background:#5e4aa5;border:0;border-radius:8px}
+[data-testid="stVerticalBlockBorderWrapper"] {border-color:#e1e3f1}
+[data-testid="stPlotlyChart"] {background:#fff;border-radius:12px;border:1px solid #e3e5f1;padding:6px}
 [data-testid="stRadio"] div[role="radiogroup"] {gap:.5rem}
 @media(max-width:850px){.block-container{padding-left:1rem;padding-right:1rem;padding-top:.7rem}.hero{padding:18px}.hero h1{font-size:1.5rem!important}[data-testid="stMetric"]{padding:11px}}
 </style>""",unsafe_allow_html=True)
@@ -44,15 +44,15 @@ def monthly_sum(d):
 
 def plot_series(series,cutoff=None,projection=None,actuals=True,scenario=True):
     fig=go.Figure()
-    fig.add_trace(go.Scatter(x=series.index,y=series.values,name='Observed production',line=dict(color='#087e92',width=2.5),mode='lines'))
+    fig.add_trace(go.Scatter(x=series.index,y=series.values,name='Observed production',line=dict(color='#3658b8',width=2.5),mode='lines'))
     if projection is not None:
         f=projection
         if scenario:
-            fig.add_trace(go.Scatter(x=list(f.Date)+list(f.Date[::-1]),y=list(f.High)+list(f.Low[::-1]),fill='toself',fillcolor='rgba(236,154,67,.18)',line=dict(color='rgba(0,0,0,0)'),name='±20% sensitivity'))
-        fig.add_trace(go.Scatter(x=f.Date,y=f.Forecast,name='Model forecast',line=dict(color='#e18b32',width=3)))
-        if actuals and 'Actual' in f:fig.add_trace(go.Scatter(x=f.Date,y=f.Actual,name='Post-cutoff actual',line=dict(color='#52618c',dash='dot')))
-    if cutoff is not None:fig.add_vline(x=cutoff.timestamp()*1000,line_dash='dash',line_color='#8495a8')
-    fig.update_layout(height=470,margin=dict(l=22,r=14,t=44,b=25),paper_bgcolor='white',plot_bgcolor='white',font=dict(color='#203e59'),hovermode='x unified',legend=dict(orientation='h',y=1.08),xaxis=dict(showgrid=True,gridcolor='#edf2f7'),yaxis=dict(showgrid=True,gridcolor='#edf2f7',tickformat='~s',automargin=True))
+            fig.add_trace(go.Scatter(x=list(f.Date)+list(f.Date[::-1]),y=list(f.High)+list(f.Low[::-1]),fill='toself',fillcolor='rgba(118,80,181,.16)',line=dict(color='rgba(0,0,0,0)'),name='±20% sensitivity'))
+        fig.add_trace(go.Scatter(x=f.Date,y=f.Forecast,name='Model forecast',line=dict(color='#7650b5',width=3)))
+        if actuals and 'Actual' in f:fig.add_trace(go.Scatter(x=f.Date,y=f.Actual,name='Post-cutoff actual',line=dict(color='#566b9a',dash='dot')))
+    if cutoff is not None:fig.add_vline(x=cutoff.timestamp()*1000,line_dash='dash',line_color='#8589aa')
+    fig.update_layout(height=470,margin=dict(l=22,r=14,t=44,b=25),paper_bgcolor='white',plot_bgcolor='white',font=dict(color='#303354'),hovermode='x unified',legend=dict(orientation='h',y=1.08),xaxis=dict(showgrid=True,gridcolor='#eceefa'),yaxis=dict(showgrid=True,gridcolor='#eceefa',tickformat='~s',automargin=True))
     return fig
 
 raw=load()
@@ -138,7 +138,8 @@ if section=='Production analytics':
     st.subheader('Historical field performance')
     st.plotly_chart(plot_series(monthly[stream]),width='stretch')
     annual=monthly[['OIL','GAS','WATER']].resample('YS').sum(min_count=1)
-    st.plotly_chart(go.Figure([go.Bar(x=annual.index.year,y=annual[x],name=x) for x in ['OIL','GAS','WATER']]).update_layout(barmode='group',height=380,plot_bgcolor='white',paper_bgcolor='white',font_color='#203e59'),width='stretch')
+    colors={'OIL':'#3658b8','GAS':'#7650b5','WATER':'#7787b8'}
+    st.plotly_chart(go.Figure([go.Bar(x=annual.index.year,y=annual[x],name=x,marker_color=colors[x]) for x in ['OIL','GAS','WATER']]).update_layout(barmode='group',height=380,plot_bgcolor='white',paper_bgcolor='white',font_color='#303354'),width='stretch')
     st.download_button('⬇ Download monthly production',monthly.to_csv().encode(),'utorogu_monthly_history.csv','text/csv')
 if section=='Model comparison':
     st.subheader('Chronological, fixed-origin model comparison')
