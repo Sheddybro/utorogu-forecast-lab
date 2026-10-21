@@ -32,6 +32,16 @@ h1,h2,h3 {color:#252451!important;letter-spacing:-.025em}
 [data-testid="stPlotlyChart"] {background:#fff;border-radius:12px;border:1px solid #e3e5f1;padding:6px}
 [data-testid="stRadio"] div[role="radiogroup"] {gap:.5rem}
 @media(max-width:850px){.block-container{padding-left:1rem;padding-right:1rem;padding-top:.7rem}.hero{padding:18px}.hero h1{font-size:1.5rem!important}[data-testid="stMetric"]{padding:11px}}
+@media(max-width:640px){
+    [data-testid="stHorizontalBlock"]{flex-wrap:wrap!important;gap:.65rem!important}
+    [data-testid="stHorizontalBlock"]>[data-testid="column"]{flex:1 1 calc(50% - .65rem)!important;width:calc(50% - .65rem)!important;min-width:calc(50% - .65rem)!important}
+    [data-testid="stRadio"] div[role="radiogroup"]{flex-wrap:wrap!important;row-gap:.25rem}
+    [data-testid="stRadio"] div[role="radiogroup"] label{white-space:normal!important}
+    [data-testid="stPlotlyChart"]{max-width:100%;overflow:hidden}
+    [data-testid="stDataFrame"]{max-width:100%;overflow-x:auto}
+    .hero{border-radius:12px;padding:16px}
+    .hero p{line-height:1.45}
+}
 </style>""",unsafe_allow_html=True)
 
 @st.cache_data(show_spinner=False)
