@@ -1,10 +1,8 @@
-# Utorogu Production Intelligence V5
+# Utorogu Production Intelligence — V6
 
-A Streamlit forecasting and data-quality application based on the Utorogu OML 34 spreadsheet and the accompanying thesis/notebook.
+## Run locally
 
-## Start locally
-
-Python 3.11 or 3.12 recommended (64-bit).
+Use Python 3.11 or 3.12. From this folder:
 
 ```powershell
 python -m venv .venv
@@ -13,10 +11,26 @@ python -m pip install -r requirements.txt
 python -m streamlit run app.py
 ```
 
-## Free cloud deployment
+Open http://localhost:8501. Use the sidebar expand arrow to show forecasting controls.
 
-Commit `app.py`, `models.py`, `data_quality.py`, `production.xlsx`, and `requirements.txt` to a GitHub repository. Set the Streamlit Community Cloud entry point to `app.py` and select Python 3.11/3.12 if offered. **TensorFlow and Prophet make the installation larger and LSTM/ensemble runs slower**; free resource limits may be exceeded. If the deployment fails because of memory, use a higher-memory hosting service or omit the optional LSTM dependency and do not select LSTM models.
+## Deploy on Streamlit Community Cloud
 
-## Research caveats
+Push the contents of **this folder** to a GitHub repository. Set **branch** to `main` (if that is your Git branch), **main file** to `app.py`. The production.xlsx workbook must be present alongside app.py, or the app will not start. Check rights and confidentiality before publishing the workbook. Heavy models such as TensorFlow/LSTM and Prophet may exceed free hosting resources. The `requirements.txt` lists optional heavy dependencies; a cloud deployment may need additional resources or a separate worker to run them reliably.
 
-This dashboard implements the named model families but does not claim to exactly reproduce the notebook's hyperparameters or its feature-based multivariate ML results. In particular XGBoost is calendar-feature based, LSTM is recursive univariate, and Prophet+XGBoost uses a calendar-feature residual learner. Validation is fixed-origin; do not use future actuals as predictors. The notebook uses an entity positive-oil-month share rule rather than the observed-span coverage filter of earlier dashboard versions. With the bundled data, December 2014 cutoff and 40% positive-oil-month rule, the cleaning implementation retained 47 entities in a local verification. This matches the thesis count but does not prove that every individual entity or downstream forecast is identical; compare entity IDs and outputs against the notebook. Units are unverified; forecast bands are sensitivity scenarios.
+## Changes from V5
+
+- Compact collapsible sidebar (250–290 px) with advanced cleaning controls in an expander.
+- Full-width charts, compact hero, readable KPI metrics and uncluttered single-page workspace navigation.
+- Chart axis title removed to avoid unreadable rotated text in narrow views.
+- Retrospective model comparison restricted to December-origin tests whose forecast horizons fall inside 2006–2014; results are chronological and fixed-origin.
+- Relative production workbook path (robust to launch working directory).
+
+## Research and validation limitations
+
+- The workbook has 13,587 raw records. Notebook-style 40% positive-oil-month filter through December 2014 yields 47 completions and 10,441 cleaned rows under the supplied cleaning implementation.
+- Models offered: Seasonal Naive, Arps Exponential DCA, Linear Trend, Random Forest, Prophet, XGBoost, LSTM, Prophet + XGBoost Hybrid, Equal-weight Ensemble, Validation-weighted Ensemble.
+- Five models (Seasonal Naive, Arps, Linear Trend, Random Forest, XGBoost) have automated local numerical smoke tests. Prophet, LSTM, hybrid, and ensembles have NOT been runtime-verified in this environment; model results have NOT been matched to the notebook's reported numbers.
+- The current XGBoost and LSTM feature/architecture choices are simplified and are NOT exact notebook replication. Missing observations and unknown production units require interpretation. ±20% is sensitivity, not a confidence interval.
+- Browser rendering and Streamlit Cloud deployment have NOT been directly verified.
+
+Run `python verify_project.py` to repeat the offline dataset and five-model smoke tests.
